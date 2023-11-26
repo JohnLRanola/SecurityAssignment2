@@ -1,9 +1,16 @@
 import java.util.Random;
+import java.util.Scanner;
 
 public class partA {
     public static void main(String[] args) {
-        int n = 7; 
-        System.out.println(Test(n));
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("Enter a number to test (or type 'exit' to quit):");
+            String input = scanner.next();
+            if (input.equalsIgnoreCase("exit")) break;
+            int n = Integer.parseInt(input);
+            System.out.println(Test(n));
+        }
     }
 
     public static String Test(int n) {
