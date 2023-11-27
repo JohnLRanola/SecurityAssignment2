@@ -1,39 +1,67 @@
-import java.util.*;
+import java.util.Random;
+import java.util.Scanner;
 
-public class partC {
-    private static final String ENGLISH_FREQUENCIES = "etaoinshrdlcumwfgypbvkjxqz";
-
+public class partA {
     public static void main(String[] args) {
-        String cipherText = "UZQSOVUOHXMOPVGPOZPEVSGZWSZOPFPESXUDBMETSXAIZVUEPHZHMDZSHZOWSFPAPPDTSVPQUZWYMXUZUHSXEPYEPOPDZSZUFPOMBZWPFUPZHMDJUDTMOHMQ";
-        System.out.println(decipher(cipherText));
+
+        Scanner scanner = new Scanner(System.in);
+
+        // While loop to allow user to input a number to test or exit
+        while (true) {
+            System.out.println("Enter a number to test (or type 'exit' to quit):");
+            String input = scanner.next();
+            if (input.equalsIgnoreCase("exit")) break;
+            int n = Integer.parseInt(input);
+            System.out.println(Test(n));
+        }
     }
 
-    private static String decipher(String cipherText) {
-        Map<Character, Integer> cipherFrequencies = new HashMap<>();
-        for (char c : cipherText.toCharArray()) {
-            cipherFrequencies.put(c, cipherFrequencies.getOrDefault(c, 0) + 1);
+    // Test method to determine if a number is prime or composite
+    public static String Test(int n) {
+
+        // if (n <= 1) or n == 4 return "composite";
+        if (n <= 1 || n == 4) return "composite";
+
+        // n is less then or equals to three it is inconclusive
+        if (n <= 3) return "inconclusive";
+
+        // Two variables, k and q, are initialized. 
+        int k = 0;
+        int q = n - 1;
+        while (q % 2 == 0) {
+            k++;
+            q /= 2;
         }
 
-        // Print the frequency of each letter
-        System.out.println("Letter frequencies: " + cipherFrequencies);
+        // A Random object is created, which will be used to generate random numbers.
+        Random rand = new Random();
 
-        List<Map.Entry<Character, Integer>> sortedFrequencies = new ArrayList<>(cipherFrequencies.entrySet());
-        sortedFrequencies.sort(Map.Entry.comparingByValue());
-        Collections.reverse(sortedFrequencies);
+        // A random integer a is generated in the range from 2 to n-4 inclusive. 
+        int a = 2 + rand.nextInt(n - 4);
 
-        Map<Character, Character> cipherToEnglish = new HashMap<>();
-        for (int i = 0; i < sortedFrequencies.size(); i++) {
-            cipherToEnglish.put(sortedFrequencies.get(i).getKey(), ENGLISH_FREQUENCIES.charAt(i));
+        // The variable x is calculated as a to the power of q, modulo n. 
+        int x = modPow(a, q, n);
+
+        if (x == 1 || x == n - 1) return "inconclusive";
+
+        for (int j = 0; j < k; j++) {
+            x = (x * x) % n;
+            if (x == n - 1) return "inconclusive";
         }
 
-        // Print the mapping of each cipher text letter to the English frequency letter
-        System.out.println("Cipher to English mapping: " + cipherToEnglish);
+        return "composite";
+    }
 
-        StringBuilder plaintext = new StringBuilder();
-        for (char c : cipherText.toCharArray()) {
-            plaintext.append(cipherToEnglish.get(c));
+    // Modular exponentiation method
+    public static int modPow(int base, int exponent, int modulus) {
+        int result = 1;
+        while (exponent > 0) {
+            if ((exponent & 1) == 1) {
+                result = (result * base) % modulus;
+            }
+            base = (base * base) % modulus;
+            exponent >>= 1;
         }
-
-        return plaintext.toString();
+        return result;
     }
 }
