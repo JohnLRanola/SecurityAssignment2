@@ -21,7 +21,11 @@ public class partB {
         0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16 
     };
 
+    // The method takes as input a byte array word and returns a byte array of the same size. The input array word is processed in-place,
+    //  meaning that the substitutions are made directly in the input array, and the same array is then returned.
     private static byte[] subWord(byte[] word) {
+        // for loop to iterate over each byte in the input array. 
+        // For each byte, it calculates the row and column indices into the S-box.
         for (int i = 0; i < word.length; i++) {
             int row = (word[i] & 0xf0) >> 4;
             int col = word[i] & 0x0f;
@@ -29,7 +33,16 @@ public class partB {
         }
         return word;
     }
-
+    
+    // method starts by storing the first byte of the word array in a temporary variable temp. 
+    // It then uses the System.arraycopy method to shift all the bytes in the array one position to the left.
+    // The parameters to System.arraycopy specify the source array, the starting position in the source array, the destination array, 
+    // the starting position in the destination array, and the number of elements to copy. 
+    // In this case, it's copying from word to word, starting from position 1 in the source and 
+    // position 0 in the destination, and copying word.length - 1 elements.
+    // After the shift operation, the byte that was originally at the start of the array 
+    // (and is now stored in temp) is moved to the end of the array.
+    // Finally, after the permutation has been completed, the method returns the word array.
     private static byte[] rotWord(byte[] word) {
         byte temp = word[0];
         System.arraycopy(word, 1, word, 0, word.length - 1);
@@ -38,18 +51,31 @@ public class partB {
     }
 
     public static byte[][] keyExpansion(byte[] key) {
+        //  method starts by creating a two-dimensional byte array w with 44 rows and 4 columns. 
+        // This array will hold the expanded key.
         byte[][] w = new byte[44][4];
         int i = 0;
+
+        // The first four rows of w are filled with the bytes from the initial cipher key. 
         while (i < 4) {
+            // Copies four bytes from key to the current row of w using the System.arraycopy method.
             System.arraycopy(key, i * 4, w[i], 0, 4);
             i++;
         }
         i = 4;
         while (i < 44) {
+            // Each iteration, it first copies the previous row of w to a temporary array temp
             byte[] temp = w[i - 1];
+
+            // If the current row index i is a multiple of 4, it applies the subWord and rotWord transformations to temp
             if (i % 4 == 0) {
+                // The subWord method substitutes each byte in temp with a corresponding byte from a substitution box (S-box), 
+                // and the rotWord method performs a cyclic permutation on temp.
                 temp = subWord(rotWord(temp));
             }
+            
+            // Calculates the current row of w by bitwise XORing the row four positions back with temp. 
+            // This is done in a for loop that iterates four times, once for each column.
             for (int j = 0; j < 4; j++) {
                 w[i][j] = (byte) (w[i - 4][j] ^ temp[j]);
             }
@@ -60,11 +86,10 @@ public class partB {
 
     
 public static void main(String[] args) {
-    // Define your key here. This is just an example.
+    // Key Defined 
     String keyString = "0f1571c947d9e8590cb7add6af7f6798";
     byte[] key = new BigInteger(keyString, 16).toByteArray();
 
-    // Call the keyExpansion method with your key
     byte[][] expandedKey = keyExpansion(key);
 
     // Print the expanded key
